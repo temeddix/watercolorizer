@@ -69,7 +69,9 @@ def watercolorize(filepath):
     hsv_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2HSV)
     _, _, gray_image = cv2.split(hsv_image)
     noisy_image = cv2.cvtColor(gray_image, cv2.COLOR_GRAY2RGBA).astype(float)
-    noisy_image = blend_modes.hard_light(noisy_image, normal_noise, 0.8)
+    noisy_image = blend_modes.hard_light(
+        noisy_image, normal_noise, 0.4 + 0.1 * strength.get()
+    )
     noisy_image = noisy_image.astype(np.uint8)
     noisy_image = cv2.cvtColor(noisy_image, cv2.COLOR_RGBA2GRAY)
 
@@ -146,6 +148,9 @@ window = tk.Tk()
 scale_factor = round(window.winfo_fpixels("1i") / 96, 2)
 
 is_unlimited = tk.IntVar()
+is_unlimited.set(0)
+strength = tk.IntVar()
+strength.set(3)
 
 default_font = font.nametofont("TkDefaultFont")
 default_font.config(size=11)
@@ -218,8 +223,53 @@ size_unlimit_check.pack(
     pady=2 * scale_factor,
 )
 
+small_frame = tk.LabelFrame(
+    inputs_frame,
+    text="",
+    padx=6 * scale_factor,
+    pady=6 * scale_factor,
+)
+small_frame.pack()
+
+strength_button = tk.Radiobutton(
+    small_frame,
+    text="Weaker",
+    value=1,
+    variable=strength,
+)
+strength_button.grid(row=0, column=0)
+strength_button = tk.Radiobutton(
+    small_frame,
+    text="Weak",
+    value=2,
+    variable=strength,
+)
+strength_button.grid(row=0, column=1)
+strength_button = tk.Radiobutton(
+    small_frame,
+    text="Moderate",
+    value=3,
+    variable=strength,
+)
+strength_button.grid(row=0, column=2)
+strength_button = tk.Radiobutton(
+    small_frame,
+    text="Strong",
+    value=4,
+    variable=strength,
+)
+strength_button.grid(row=0, column=3)
+strength_button = tk.Radiobutton(
+    small_frame,
+    text="Stronger",
+    value=5,
+    variable=strength,
+)
+strength_button.grid(row=0, column=4)
+
+
 window.title("Watercolorizer")
-window.minsize(int(1120 * scale_factor), int(260 * scale_factor))
+window.minsize(int(1120 * scale_factor), int(300 * scale_factor))
 window.geometry("0x0")
 window.iconbitmap("./resource/icon.ico")
 window.mainloop()
