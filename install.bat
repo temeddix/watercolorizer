@@ -24,6 +24,7 @@ pip install flake8-print
 pip install flake8-blind-except
 pip install flake8-comprehensions
 pip install flake8-use-fstring
+pip install blend-modes
 python ./resource/prepare_coding.py
 if %ERRORLEVEL% == 0 (
     cls & echo ■■■■■ Everything is ready. ■■■■■ & TIMEOUT 3
