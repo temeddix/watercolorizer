@@ -16,6 +16,8 @@ call %USERPROFILE%/miniconda3/condabin/conda.bat config --set channel_priority s
 call %USERPROFILE%/miniconda3/condabin/conda.bat create -y -n watercolorize python=3.8 --force
 call %USERPROFILE%/miniconda3/condabin/conda.bat activate watercolorize
 pip install opencv-python
+pip install blend-modes
+pip install scikit-image
 pip install black
 pip install flake8
 pip install pep8-naming
@@ -24,7 +26,6 @@ pip install flake8-print
 pip install flake8-blind-except
 pip install flake8-comprehensions
 pip install flake8-use-fstring
-pip install blend-modes
 python ./resource/prepare_coding.py
 if %ERRORLEVEL% == 0 (
     cls & echo ■■■■■ Everything is ready. ■■■■■ & TIMEOUT 3

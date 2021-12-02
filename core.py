@@ -11,6 +11,7 @@ import tempfile
 import cv2
 import numpy as np
 import blend_modes
+from skimage import exposure
 
 
 # Set DPI
@@ -84,17 +85,20 @@ def watercolorize(filepath):
 
         blurred_image = cv2.imread(blurred_filepath, cv2.IMREAD_GRAYSCALE)
 
+    matched_image = exposure.match_histograms(blurred_image, gray_image)
+    matched_image = matched_image.astype(np.uint8)
+
     hsv_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2HSV)
     hue, saturation, _ = cv2.split(hsv_image)
-    hsv_image = cv2.merge([hue, saturation, blurred_image])
+    hsv_image = cv2.merge([hue, saturation, matched_image])
     colorized_image = cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
 
     final_filepath = os.path.splitext(filepath)[0] + "-watercolorized.jpg"
 
     # For Unicode filepaths...
     _, buffer = cv2.imencode(".jpg", colorized_image, None)
-    with open(final_filepath, mode="w+b") as f:
-        buffer.tofile(f)
+    with open(final_filepath, mode="w+b") as file:
+        buffer.tofile(file)
 
 
 def automate():
