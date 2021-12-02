@@ -50,6 +50,18 @@ def watercolorize(filepath):
     original_image = cv2.imdecode(temporary_array, cv2.IMREAD_UNCHANGED)
     row_count, column_count, _ = original_image.shape
 
+    if row_count > 1280 and column_count > 1280:
+        if row_count > column_count:
+            size = (int(column_count * (1280 / row_count)), 1280)
+        else:
+            size = (1280, int(row_count * (1280 / column_count)))
+    elif row_count > 1280:
+        size = (int(column_count * (1280 / row_count)), 1280)
+    elif column_count > 1280:
+        size = (1280, int(row_count * (1280 / column_count)))
+    original_image = cv2.resize(original_image, size)
+    row_count, column_count, _ = original_image.shape
+
     normal_noise = np.random.rand(row_count, column_count) * 256
     normal_noise[normal_noise < 192] = 0
     normal_noise[normal_noise >= 192] = 255
@@ -59,7 +71,7 @@ def watercolorize(filepath):
     hsv_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2HSV)
     _, _, gray_image = cv2.split(hsv_image)
     noisy_image = cv2.cvtColor(gray_image, cv2.COLOR_GRAY2RGBA).astype(float)
-    noisy_image = blend_modes.hard_light(noisy_image, normal_noise, 0.6)
+    noisy_image = blend_modes.hard_light(noisy_image, normal_noise, 0.8)
     noisy_image = noisy_image.astype(np.uint8)
     noisy_image = cv2.cvtColor(noisy_image, cv2.COLOR_RGBA2GRAY)
 
