@@ -3,7 +3,7 @@ import json
 import pathlib
 
 userpath = pathlib.Path.home()
-pythonpath = userpath / "miniconda3/envs/auto-asset-trader/python.exe"
+pythonpath = userpath / "miniconda3/envs/watercolorize/python.exe"
 
 vscode_settings = {
     "python.defaultInterpreterPath": str(pythonpath),
