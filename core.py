@@ -43,10 +43,11 @@ window = tk.Tk()
 scale_factor = round(window.winfo_fpixels("1i") / 96, 2)
 
 default_font = font.nametofont("TkDefaultFont")
+default_font.config(size=11)
 big_font = default_font.copy()
-big_font.config(size=14)
+big_font.config(size=16)
 small_font = default_font.copy()
-small_font.config(size=7)
+small_font.config(size=8)
 
 inputs_frame = tk.LabelFrame(
     window,
@@ -58,7 +59,7 @@ inputs_frame.place(
     anchor="c",
     relx=0.5,
     rely=0.5,
-    width=450 * scale_factor,
+    width=520 * scale_factor,
 )
 
 title_label = tk.Label(
@@ -77,6 +78,20 @@ folderpath_input = tk.Entry(
     textvariable=str,
 )
 folderpath_input.pack(
+    padx=2 * scale_factor,
+    pady=2 * scale_factor,
+)
+
+guide_label = tk.Label(
+    inputs_frame,
+    text=(
+        "All JPEG images inside this folder will be watercolorized.\nOriginal image is"
+        " left untouched, while the new image is placed beside the original."
+    ),
+    anchor="center",
+    font=small_font,
+)
+guide_label.pack(
     padx=2 * scale_factor,
     pady=2 * scale_factor,
 )
@@ -145,7 +160,7 @@ def job():
             filename
             for filename in os.listdir(folderpath)
             if os.path.isfile(os.path.join(folderpath, filename))
-            and filename.endswith(".jpg")
+            and filename.endswith([".jpg", ".jpeg"])
         ]
         for filename in filenames:
             if not filename.endswith("-watercolorized.jpg"):
