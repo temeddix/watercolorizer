@@ -19,9 +19,12 @@ pip install opencv-python
 pip install black
 pip install flake8
 pip install pep8-naming
-pip install flake8-builtins
+pip install flake8-variables-names
+pip install flake8-print
 pip install flake8-blind-except
-python ./prepare_coding.py
+pip install flake8-comprehensions
+pip install flake8-use-fstring
+python ./resource/prepare_coding.py
 if %ERRORLEVEL% == 0 (
     cls & echo ■■■■■ 모든 준비가 끝났습니다. 이제 앱을 사용할 수 있습니다. ■■■■■ & TIMEOUT 3
 ) else (
