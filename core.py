@@ -51,15 +51,15 @@ def watercolorize(filepath):
     gray_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
 
     row_count, column_count = gray_image.shape
-    random_noise_image = np.random.rand(row_count, column_count) * 256
-    random_noise_image[random_noise_image < 128] = 0
-    random_noise_image[random_noise_image >= 128] = 255
-    random_noise_image = random_noise_image.astype(np.uint8)
-    noisy_image = blend_modes.overlay(
-        cv2.cvtColor(gray_image, cv2.COLOR_GRAY2RGBA).astype(float),
-        cv2.cvtColor(random_noise_image, cv2.COLOR_GRAY2RGBA).astype(float),
-        1,
-    )
+    random_noise = np.random.rand(row_count, column_count) * 256
+    random_noise[random_noise < 128] = 0
+    random_noise[random_noise >= 128] = 255
+    random_noise = random_noise.astype(np.uint8)
+    random_noise = cv2.cvtColor(random_noise, cv2.COLOR_GRAY2RGBA).astype(float)
+
+    noisy_image = cv2.cvtColor(gray_image, cv2.COLOR_GRAY2RGBA).astype(float)
+    noisy_image = blend_modes.overlay(noisy_image, random_noise, 1)
+    noisy_image = noisy_image.astype(np.uint8)
 
     with tempfile.TemporaryDirectory() as temporary_folderpath:
 
