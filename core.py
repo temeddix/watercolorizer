@@ -4,8 +4,11 @@ import platform
 import ctypes
 import threading
 import time
+import subprocess
+
 import cv2
 import numpy as np
+
 
 # Set DPI
 if platform.system() == "Windows":
@@ -99,21 +102,6 @@ status_label.pack(
     pady=2 * scale_factor,
 )
 
-detail_label = tk.Label(
-    inputs_frame,
-    text="Status Detail",
-    width=50,
-    anchor="center",
-    font=("*", 8),
-)
-detail_label.pack(
-    padx=2 * scale_factor,
-    pady=2 * scale_factor,
-)
-
-
-did_show = False
-
 
 def watercolorize(filepath):
     original_image = cv2.imread(filepath, cv2.IMREAD_COLOR)
@@ -121,41 +109,67 @@ def watercolorize(filepath):
     gray_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
 
     row_count, column_count = gray_image.shape
-    random_noise_image = np.random.randn(row_count, column_count) * 32
+    random_noise_image = np.random.randn(row_count, column_count) * 128
     noisy_image = gray_image + random_noise_image
     noisy_image = np.clip(noisy_image, 0, 255)
     noisy_image = noisy_image.astype(np.uint8)
 
-    global did_show
-    if not did_show:
-        did_show = True
-        cv2.imshow("Noisy", noisy_image)
-        cv2.waitKey(0)  # delay 0
-        cv2.destroyAllWindows()
+    temporary_filepath = os.path.splitext(filepath)[0] + "-temporary.jpg"
+    cv2.imwrite(temporary_filepath, noisy_image)
+
+    subprocess.call(
+        [
+            "./denoiser/Denoiser.exe",
+            "-i",
+            temporary_filepath,
+            "-o",
+            temporary_filepath,
+        ]
+    )
+
+    while not os.path.isfile(temporary_filepath):
+        time.sleep(0.01)
+
+    blurred_image = cv2.imread(temporary_filepath, cv2.IMREAD_GRAYSCALE)
+    os.remove(temporary_filepath)
+    hsv_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2HSV)
+    hue, saturation, _ = cv2.split(hsv_image)
+    hsv_image = cv2.merge([hue, saturation, blurred_image])
+    colorized_image = cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
+
+    final_filepath = os.path.splitext(filepath)[0] + "-watercolorized.jpg"
+    cv2.imwrite(final_filepath, colorized_image)
 
 
 def job():
     while True:
+        global is_on
+        if not is_on:
+            time.sleep(1)
+            continue
         folderpath = folderpath_input.get()
-        try:
-            filenames = [
-                filename
-                for filename in os.listdir(folderpath)
-                if os.path.isfile(os.path.join(folderpath, filename))
-            ]
-            for filename in filenames:
-                if not filename.endswith("-watercolorized.jpg"):
-                    new_filename = os.path.splitext(filename)[0] + "-watercolorized.jpg"
-                    if not os.path.isfile(os.path.join(folderpath, new_filename)):
-                        watercolorize(os.path.join(folderpath, filename))
-        except FileNotFoundError:
-            pass
+        if not os.path.isdir(folderpath):
+            time.sleep(1)
+            continue
+        filenames = [
+            filename
+            for filename in os.listdir(folderpath)
+            if os.path.isfile(os.path.join(folderpath, filename))
+        ]
+        for filename in filenames:
+            if not filename.endswith("-watercolorized.jpg"):
+                filepath = os.path.join(folderpath, filename)
+                final_filepath = os.path.splitext(filepath)[0] + "-watercolorized.jpg"
+                if not os.path.isfile(final_filepath) and not filepath.endswith(
+                    "-temporary.jpg"
+                ):
+                    watercolorize(filepath)
         time.sleep(1)
 
 
 threading.Thread(target=job, name="Automation", daemon=True).start()
 
-window.title("Generator")
+window.title("Watercolorizer")
 window.minsize(int(600 * scale_factor), int(600 * scale_factor))
 window.geometry("0x0")
 window.iconbitmap("./icon.ico")
