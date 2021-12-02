@@ -30,9 +30,6 @@ elif platform.system() == "Darwin":  # macOS
     pass
 
 
-is_on = False
-
-
 def toggle_automation():
     global is_on
     if is_on:
@@ -50,17 +47,18 @@ def watercolorize(filepath):
     original_image = cv2.imdecode(temporary_array, cv2.IMREAD_UNCHANGED)
     row_count, column_count, _ = original_image.shape
 
-    if row_count > 1280 and column_count > 1280:
-        if row_count > column_count:
+    if not is_unlimited.get():
+        if row_count > 1280 and column_count > 1280:
+            if row_count > column_count:
+                size = (int(column_count * (1280 / row_count)), 1280)
+            else:
+                size = (1280, int(row_count * (1280 / column_count)))
+        elif row_count > 1280:
             size = (int(column_count * (1280 / row_count)), 1280)
-        else:
+        elif column_count > 1280:
             size = (1280, int(row_count * (1280 / column_count)))
-    elif row_count > 1280:
-        size = (int(column_count * (1280 / row_count)), 1280)
-    elif column_count > 1280:
-        size = (1280, int(row_count * (1280 / column_count)))
-    original_image = cv2.resize(original_image, size)
-    row_count, column_count, _ = original_image.shape
+        original_image = cv2.resize(original_image, size)
+        row_count, column_count, _ = original_image.shape
 
     normal_noise = np.random.rand(row_count, column_count) * 256
     normal_noise[normal_noise < 192] = 0
@@ -140,10 +138,14 @@ def automate():
         time.sleep(1)
 
 
+is_on = False
+
 threading.Thread(target=automate, name="Automate", daemon=True).start()
 
 window = tk.Tk()
 scale_factor = round(window.winfo_fpixels("1i") / 96, 2)
+
+is_unlimited = tk.IntVar()
 
 default_font = font.nametofont("TkDefaultFont")
 default_font.config(size=11)
@@ -206,8 +208,18 @@ toggle_button.pack(
     pady=2 * scale_factor,
 )
 
+size_unlimit_check = tk.Checkbutton(
+    inputs_frame,
+    text="Do not limit output image size to 1280 pixels",
+    variable=is_unlimited,
+)
+size_unlimit_check.pack(
+    padx=2 * scale_factor,
+    pady=2 * scale_factor,
+)
+
 window.title("Watercolorizer")
-window.minsize(int(1120 * scale_factor), int(200 * scale_factor))
+window.minsize(int(1120 * scale_factor), int(260 * scale_factor))
 window.geometry("0x0")
 window.iconbitmap("./resource/icon.ico")
 window.mainloop()
