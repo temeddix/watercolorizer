@@ -6,6 +6,7 @@ import ctypes
 import threading
 import time
 import subprocess
+import tempfile
 
 import cv2
 import numpy as np
@@ -59,7 +60,7 @@ inputs_frame.place(
     anchor="c",
     relx=0.5,
     rely=0.5,
-    width=520 * scale_factor,
+    width=1040 * scale_factor,
 )
 
 title_label = tk.Label(
@@ -72,11 +73,7 @@ title_label.pack(
     pady=2 * scale_factor,
 )
 
-folderpath_input = tk.Entry(
-    inputs_frame,
-    width=62,
-    textvariable=str,
-)
+folderpath_input = tk.Entry(inputs_frame, width=120, textvariable=str, justify="center")
 folderpath_input.pack(
     padx=2 * scale_factor,
     pady=2 * scale_factor,
@@ -109,7 +106,10 @@ toggle_button.pack(
 
 
 def watercolorize(filepath):
-    original_image = cv2.imread(filepath, cv2.IMREAD_COLOR)
+
+    # For Unicode filepaths...
+    temporary_array = np.fromfile(filepath, np.uint8)
+    original_image = cv2.imdecode(temporary_array, cv2.IMREAD_UNCHANGED)
 
     gray_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
 
@@ -119,34 +119,44 @@ def watercolorize(filepath):
     noisy_image = np.clip(noisy_image, 0, 255)
     noisy_image = noisy_image.astype(np.uint8)
 
-    temporary_filepath = os.path.splitext(filepath)[0] + "-temporary.jpg"
-    cv2.imwrite(temporary_filepath, noisy_image)
+    with tempfile.TemporaryDirectory() as temporary_folderpath:
 
-    subprocess.call(
-        [
-            "./denoiser/Denoiser.exe",
-            "-i",
-            temporary_filepath,
-            "-o",
-            temporary_filepath,
-        ]
-    )
+        # These should be ASCII filepaths
+        noisy_filepath = os.path.join(temporary_folderpath, "noisy_image.jpg")
+        blurred_filepath = os.path.join(temporary_folderpath, "blurred_image.jpg")
 
-    while not os.path.isfile(temporary_filepath):
-        time.sleep(0.01)
+        cv2.imwrite(noisy_filepath, noisy_image)
 
-    blurred_image = cv2.imread(temporary_filepath, cv2.IMREAD_GRAYSCALE)
-    os.remove(temporary_filepath)
+        subprocess.call(
+            [
+                "./denoiser/Denoiser.exe",
+                "-i",
+                noisy_filepath,
+                "-o",
+                blurred_filepath,
+            ]
+        )
+
+        while not os.path.isfile(blurred_filepath):
+            time.sleep(0.01)
+
+        blurred_image = cv2.imread(blurred_filepath, cv2.IMREAD_GRAYSCALE)
+
     hsv_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2HSV)
     hue, saturation, _ = cv2.split(hsv_image)
     hsv_image = cv2.merge([hue, saturation, blurred_image])
     colorized_image = cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
 
     final_filepath = os.path.splitext(filepath)[0] + "-watercolorized.jpg"
-    cv2.imwrite(final_filepath, colorized_image)
+
+    # For Unicode filepaths...
+    _, buffer = cv2.imencode(".jpg", colorized_image, None)
+    with open(final_filepath, mode="w+b") as f:
+        buffer.tofile(f)
 
 
-def job():
+def automate():
+
     while True:
         global is_on
         if not is_on:
@@ -160,23 +170,21 @@ def job():
             filename
             for filename in os.listdir(folderpath)
             if os.path.isfile(os.path.join(folderpath, filename))
-            and filename.endswith([".jpg", ".jpeg"])
+            and filename.endswith((".jpg", ".jpeg"))
         ]
         for filename in filenames:
             if not filename.endswith("-watercolorized.jpg"):
                 filepath = os.path.join(folderpath, filename)
                 final_filepath = os.path.splitext(filepath)[0] + "-watercolorized.jpg"
-                if not os.path.isfile(final_filepath) and not filepath.endswith(
-                    "-temporary.jpg"
-                ):
+                if not os.path.isfile(final_filepath):
                     watercolorize(filepath)
         time.sleep(1)
 
 
-threading.Thread(target=job, name="Automation", daemon=True).start()
+threading.Thread(target=automate, name="Automate", daemon=True).start()
 
 window.title("Watercolorizer")
-window.minsize(int(600 * scale_factor), int(200 * scale_factor))
+window.minsize(int(1120 * scale_factor), int(200 * scale_factor))
 window.geometry("0x0")
 window.iconbitmap("./resource/icon.ico")
 window.mainloop()
