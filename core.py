@@ -27,6 +27,7 @@ elif platform.system() == "Linux":
 elif platform.system() == "Darwin":  # macOS
     pass
 
+
 is_on = False
 
 
@@ -38,71 +39,6 @@ def toggle_automation():
     else:
         is_on = True
         toggle_button.config(text="Running")
-
-
-window = tk.Tk()
-scale_factor = round(window.winfo_fpixels("1i") / 96, 2)
-
-default_font = font.nametofont("TkDefaultFont")
-default_font.config(size=11)
-big_font = default_font.copy()
-big_font.config(size=16)
-small_font = default_font.copy()
-small_font.config(size=8)
-
-inputs_frame = tk.LabelFrame(
-    window,
-    text="",
-    padx=24 * scale_factor,
-    pady=24 * scale_factor,
-)
-inputs_frame.place(
-    anchor="c",
-    relx=0.5,
-    rely=0.5,
-    width=1040 * scale_factor,
-)
-
-title_label = tk.Label(
-    inputs_frame,
-    text="Folder to automate conversion",
-    anchor="center",
-)
-title_label.pack(
-    padx=2 * scale_factor,
-    pady=2 * scale_factor,
-)
-
-folderpath_input = tk.Entry(inputs_frame, width=120, textvariable=str, justify="center")
-folderpath_input.pack(
-    padx=2 * scale_factor,
-    pady=2 * scale_factor,
-)
-
-guide_label = tk.Label(
-    inputs_frame,
-    text=(
-        "All JPEG images inside this folder will be watercolorized.\nOriginal image is"
-        " left untouched, while the new image is placed beside the original."
-    ),
-    anchor="center",
-    font=small_font,
-)
-guide_label.pack(
-    padx=2 * scale_factor,
-    pady=2 * scale_factor,
-)
-
-toggle_button = tk.Button(
-    inputs_frame,
-    width=20,
-    text="Not Running",
-    command=toggle_automation,
-)
-toggle_button.pack(
-    padx=2 * scale_factor,
-    pady=2 * scale_factor,
-)
 
 
 def watercolorize(filepath):
@@ -182,6 +118,70 @@ def automate():
 
 
 threading.Thread(target=automate, name="Automate", daemon=True).start()
+
+window = tk.Tk()
+scale_factor = round(window.winfo_fpixels("1i") / 96, 2)
+
+default_font = font.nametofont("TkDefaultFont")
+default_font.config(size=11)
+big_font = default_font.copy()
+big_font.config(size=16)
+small_font = default_font.copy()
+small_font.config(size=8)
+
+inputs_frame = tk.LabelFrame(
+    window,
+    text="",
+    padx=24 * scale_factor,
+    pady=24 * scale_factor,
+)
+inputs_frame.place(
+    anchor="c",
+    relx=0.5,
+    rely=0.5,
+    width=1040 * scale_factor,
+)
+
+title_label = tk.Label(
+    inputs_frame,
+    text="Folder containing images to watercolorize",
+    anchor="center",
+)
+title_label.pack(
+    padx=2 * scale_factor,
+    pady=2 * scale_factor,
+)
+
+folderpath_input = tk.Entry(inputs_frame, width=120, textvariable=str, justify="center")
+folderpath_input.pack(
+    padx=2 * scale_factor,
+    pady=2 * scale_factor,
+)
+
+guide_label = tk.Label(
+    inputs_frame,
+    text=(
+        "All JPEG images inside this folder will be watercolorized.\nOriginal image is"
+        " left untouched, while the new image is placed beside the original."
+    ),
+    anchor="center",
+    font=small_font,
+)
+guide_label.pack(
+    padx=2 * scale_factor,
+    pady=2 * scale_factor,
+)
+
+toggle_button = tk.Button(
+    inputs_frame,
+    width=20,
+    text="Not Running",
+    command=toggle_automation,
+)
+toggle_button.pack(
+    padx=2 * scale_factor,
+    pady=2 * scale_factor,
+)
 
 window.title("Watercolorizer")
 window.minsize(int(1120 * scale_factor), int(200 * scale_factor))
