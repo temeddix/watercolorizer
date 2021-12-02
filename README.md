@@ -8,7 +8,8 @@ Apply watercolor look to photos or renders
 * Preparing environment is easy with `install.bat`
 * Executing is even easier with `execute.bat`
 * Only available on Windows
-* Compiled OIDN Denoiser from https://github.com/DeclanRussell/IntelOIDenoiser
+* Compiled OIDN from https://github.com/DeclanRussell/IntelOIDenoiser
+* Underlying mechanism is to add intentional noise to the image in a specific way and denoise the image with OIDN AI denoiser. This way small details get lost while big details mostly preserve their shape.
 ## Samples
 
 <img width="40%" alt="image" src="https://user-images.githubusercontent.com/66480156/144493200-2bd37efe-29d7-4c58-9040-2d90fde2aedb.jpg"><img width="40%" alt="image" src="https://user-images.githubusercontent.com/66480156/144493204-5287348d-96f4-4caa-a21c-cec19cd5e377.jpg">
