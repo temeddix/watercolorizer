@@ -155,6 +155,7 @@ def job():
             filename
             for filename in os.listdir(folderpath)
             if os.path.isfile(os.path.join(folderpath, filename))
+            and filename.endswith(".jpg")
         ]
         for filename in filenames:
             if not filename.endswith("-watercolorized.jpg"):
