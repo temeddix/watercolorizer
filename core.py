@@ -51,8 +51,8 @@ def watercolorize(filepath):
     row_count, column_count, _ = original_image.shape
 
     normal_noise = np.random.rand(row_count, column_count) * 256
-    normal_noise[normal_noise < 128] = 0
-    normal_noise[normal_noise >= 128] = 255
+    normal_noise[normal_noise < 192] = 0
+    normal_noise[normal_noise >= 192] = 255
     normal_noise = normal_noise.astype(np.uint8)
     normal_noise = cv2.cvtColor(normal_noise, cv2.COLOR_GRAY2RGBA).astype(float)
 
