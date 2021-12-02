@@ -1,5 +1,6 @@
 import os
 import tkinter as tk
+from tkinter import font
 import platform
 import ctypes
 import threading
@@ -32,35 +33,38 @@ def toggle_automation():
     global is_on
     if is_on:
         is_on = False
-        status_label.config(text="Not Running")
+        toggle_button.config(text="Not Running")
     else:
         is_on = True
-        status_label.config(text="Running")
+        toggle_button.config(text="Running")
 
 
 window = tk.Tk()
 scale_factor = round(window.winfo_fpixels("1i") / 96, 2)
 
+default_font = font.nametofont("TkDefaultFont")
+big_font = default_font.copy()
+big_font.config(size=14)
+small_font = default_font.copy()
+small_font.config(size=7)
+
 inputs_frame = tk.LabelFrame(
     window,
     text="",
-    padx=6 * scale_factor,
-    pady=6 * scale_factor,
-    height=1000,
+    padx=24 * scale_factor,
+    pady=24 * scale_factor,
 )
-inputs_frame.pack(
-    side="top",
-    fill="y",
-    padx=10 * scale_factor,
-    pady=10 * scale_factor,
+inputs_frame.place(
+    anchor="c",
+    relx=0.5,
+    rely=0.5,
+    width=450 * scale_factor,
 )
 
 title_label = tk.Label(
     inputs_frame,
-    text="Folder to Automate",
-    width=50,
+    text="Folder to automate conversion",
     anchor="center",
-    font=("*", 10),
 )
 title_label.pack(
     padx=2 * scale_factor,
@@ -71,7 +75,6 @@ folderpath_input = tk.Entry(
     inputs_frame,
     width=62,
     textvariable=str,
-    font=("*", 10),
 )
 folderpath_input.pack(
     padx=2 * scale_factor,
@@ -80,24 +83,11 @@ folderpath_input.pack(
 
 toggle_button = tk.Button(
     inputs_frame,
-    width=30,
-    text="Toggle",
-    font=("*", 10),
+    width=20,
+    text="Not Running",
     command=toggle_automation,
 )
 toggle_button.pack(
-    padx=2 * scale_factor,
-    pady=2 * scale_factor,
-)
-
-status_label = tk.Label(
-    inputs_frame,
-    text="Not Running",
-    width=50,
-    anchor="center",
-    font=("*", 14),
-)
-status_label.pack(
     padx=2 * scale_factor,
     pady=2 * scale_factor,
 )
@@ -171,7 +161,7 @@ def job():
 threading.Thread(target=job, name="Automation", daemon=True).start()
 
 window.title("Watercolorizer")
-window.minsize(int(600 * scale_factor), int(600 * scale_factor))
+window.minsize(int(600 * scale_factor), int(200 * scale_factor))
 window.geometry("0x0")
 window.iconbitmap("./resource/icon.ico")
 window.mainloop()
