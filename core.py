@@ -47,19 +47,19 @@ def watercolorize(filepath):
     # For Unicode filepaths...
     temporary_array = np.fromfile(filepath, np.uint8)
     original_image = cv2.imdecode(temporary_array, cv2.IMREAD_UNCHANGED)
+    row_count, column_count, _ = original_image.shape
+
+    normal_noise = np.random.rand(row_count, column_count) * 256
+    normal_noise[normal_noise < 128] = 0
+    normal_noise[normal_noise >= 128] = 255
+    normal_noise = normal_noise.astype(np.uint8)
+    normal_noise = cv2.cvtColor(normal_noise, cv2.COLOR_GRAY2RGBA).astype(float)
 
     gray_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
-
-    row_count, column_count = gray_image.shape
-    random_noise = np.random.rand(row_count, column_count) * 256
-    random_noise[random_noise < 128] = 0
-    random_noise[random_noise >= 128] = 255
-    random_noise = random_noise.astype(np.uint8)
-    random_noise = cv2.cvtColor(random_noise, cv2.COLOR_GRAY2RGBA).astype(float)
-
     noisy_image = cv2.cvtColor(gray_image, cv2.COLOR_GRAY2RGBA).astype(float)
-    noisy_image = blend_modes.overlay(noisy_image, random_noise, 1)
+    noisy_image = blend_modes.hard_light(noisy_image, normal_noise, 0.4)
     noisy_image = noisy_image.astype(np.uint8)
+    noisy_image = cv2.cvtColor(noisy_image, cv2.COLOR_RGBA2GRAY)
 
     with tempfile.TemporaryDirectory() as temporary_folderpath:
 
