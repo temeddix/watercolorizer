@@ -56,7 +56,8 @@ def watercolorize(filepath):
     normal_noise = normal_noise.astype(np.uint8)
     normal_noise = cv2.cvtColor(normal_noise, cv2.COLOR_GRAY2RGBA).astype(float)
 
-    gray_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
+    hsv_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2HSV)
+    _, _, gray_image = cv2.split(hsv_image)
     noisy_image = cv2.cvtColor(gray_image, cv2.COLOR_GRAY2RGBA).astype(float)
     noisy_image = blend_modes.hard_light(noisy_image, normal_noise, 0.6)
     noisy_image = noisy_image.astype(np.uint8)
@@ -66,7 +67,7 @@ def watercolorize(filepath):
 
         # These should be ASCII filepaths
         noisy_filepath = os.path.join(temporary_folderpath, "noisy_image.jpg")
-        blurred_filepath = os.path.join(temporary_folderpath, "blurred_image.jpg")
+        squashed_filepath = os.path.join(temporary_folderpath, "squashed_image.jpg")
 
         cv2.imwrite(noisy_filepath, noisy_image)
 
@@ -76,16 +77,16 @@ def watercolorize(filepath):
                 "-i",
                 noisy_filepath,
                 "-o",
-                blurred_filepath,
+                squashed_filepath,
             ]
         )
 
-        while not os.path.isfile(blurred_filepath):
+        while not os.path.isfile(squashed_filepath):
             time.sleep(0.01)
 
-        blurred_image = cv2.imread(blurred_filepath, cv2.IMREAD_GRAYSCALE)
+        squashed_image = cv2.imread(squashed_filepath, cv2.IMREAD_GRAYSCALE)
 
-    matched_image = exposure.match_histograms(blurred_image, gray_image)
+    matched_image = exposure.match_histograms(squashed_image, gray_image)
     matched_image = matched_image.astype(np.uint8)
 
     hsv_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2HSV)
