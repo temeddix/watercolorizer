@@ -58,7 +58,7 @@ def watercolorize(filepath):
 
     gray_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
     noisy_image = cv2.cvtColor(gray_image, cv2.COLOR_GRAY2RGBA).astype(float)
-    noisy_image = blend_modes.hard_light(noisy_image, normal_noise, 0.4)
+    noisy_image = blend_modes.hard_light(noisy_image, normal_noise, 0.6)
     noisy_image = noisy_image.astype(np.uint8)
     noisy_image = cv2.cvtColor(noisy_image, cv2.COLOR_RGBA2GRAY)
 
