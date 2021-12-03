@@ -1,7 +1,7 @@
 # Watercolorize
 Apply watercolor look to your photos or renders
 
-<img width="842" alt="image" src="https://user-images.githubusercontent.com/66480156/144584449-3ec62f68-aede-4944-9b94-df1e705e8d3d.png">
+<img width="842" alt="image" src="https://user-images.githubusercontent.com/66480156/144597812-f8d0ab94-949e-4a38-8c1a-604a894810a6.png">
 
 ## About
 * May be useful at certain cases like comics or abstract art, where too much detail is not preferred.
