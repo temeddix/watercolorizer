@@ -31,6 +31,26 @@ elif platform.system() == "Darwin":  # macOS
     pass
 
 
+def create_lineart(gray_image):
+    row_count, column_count = gray_image.shape
+    kernel = np.array(
+        [
+            [1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1],
+        ],
+        np.uint8,
+    )
+    dilated_image = cv2.dilate(gray_image, kernel, iterations=1)
+    difference_image = cv2.absdiff(dilated_image, gray_image)
+    difference_image[difference_image >= 16] = 255
+    lineart_image = np.zeros((row_count, column_count, 4), dtype=np.uint8)
+    lineart_image[:, :, 3] = difference_image
+    return lineart_image
+
+
 def toggle_automation():
     global is_on
     if is_on:
@@ -115,6 +135,16 @@ def watercolorize(filepath):
     colorized_image = cv2.merge([hue, saturation, matched_image])
     colorized_image = cv2.cvtColor(colorized_image, cv2.COLOR_HSV2BGR)
 
+    if is_lineart_on:
+        lineart_image = create_lineart(squashed_image)
+        colorized_image = blend_modes.normal(
+            cv2.cvtColor(colorized_image, cv2.COLOR_BGR2RGBA).astype(float),
+            lineart_image.astype(float),
+            1,
+        )
+        colorized_image = colorized_image.astype(np.uint8)
+        colorized_image = cv2.cvtColor(colorized_image, cv2.COLOR_RGBA2BGR)
+
     # For Unicode filepaths do not use cv2.imwrite
     output_image = cv2.cvtColor(colorized_image, cv2.COLOR_BGR2RGB)
     output_filepath = os.path.splitext(filepath)[0] + "-watercolorized.jpg"
@@ -155,6 +185,8 @@ window = tk.Tk()
 scale_factor = round(window.winfo_fpixels("1i") / 96, 2)
 
 is_unlimited = tk.IntVar()
+is_unlimited.set(0)
+is_lineart_on = tk.IntVar()
 is_unlimited.set(0)
 strength = tk.IntVar()
 strength.set(3)
@@ -211,32 +243,31 @@ guide_label.pack(
     pady=2 * scale_factor,
 )
 
-toggle_button = tk.Button(
+check_frame = tk.LabelFrame(
     inputs_frame,
-    width=20,
-    text="Not Running",
-    command=toggle_automation,
+    text="",
+    borderwidth=0,
 )
-toggle_button.pack(
-    padx=2 * scale_factor,
-    pady=2 * scale_factor,
+check_frame.pack()
+
+lineart_check = tk.Checkbutton(
+    check_frame,
+    text="Add Lineart",
+    variable=is_lineart_on,
 )
+lineart_check.grid(row=0, column=0)
 
 size_unlimit_check = tk.Checkbutton(
-    inputs_frame,
+    check_frame,
     text="Do not limit output image size to 1280 pixels",
     variable=is_unlimited,
 )
-size_unlimit_check.pack(
-    padx=2 * scale_factor,
-    pady=2 * scale_factor,
-)
+size_unlimit_check.grid(row=0, column=1)
 
 small_frame = tk.LabelFrame(
     inputs_frame,
     text="",
-    padx=6 * scale_factor,
-    pady=6 * scale_factor,
+    borderwidth=0,
 )
 small_frame.pack()
 
@@ -275,6 +306,17 @@ strength_button = tk.Radiobutton(
     variable=strength,
 )
 strength_button.grid(row=0, column=4)
+
+toggle_button = tk.Button(
+    inputs_frame,
+    width=20,
+    text="Not Running",
+    command=toggle_automation,
+)
+toggle_button.pack(
+    padx=2 * scale_factor,
+    pady=2 * scale_factor,
+)
 
 
 window.title("Watercolorizer")
