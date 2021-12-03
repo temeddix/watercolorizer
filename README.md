@@ -4,9 +4,9 @@ Apply watercolor look to your photos or renders
 <img width="842" alt="image" src="https://user-images.githubusercontent.com/66480156/144584449-3ec62f68-aede-4944-9b94-df1e705e8d3d.png">
 
 ## About
-* May be useful at certain cases
-* Preparing environment is easy with `install.bat`
-* Executing is even easier with `execute.bat`
+* May be useful at certain cases like comics or abstract art, where too much detail is not preferred.
+* Preparing environment is easy with `install.bat`.
+* Executing is even easier with `execute.bat`.
 * Currently only available on Windows. Support for macOS and Linux can be added if there is demand for it.
 * Underlying mechanism is to add intentional noise to the image in a specific way and denoise the image with Intel OIDN AI denoiser. This way small details get lost while big details mostly preserve their shape.
 * For further support, please write it as an issue at the GitHub repository page of this project.
