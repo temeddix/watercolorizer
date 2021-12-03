@@ -198,8 +198,9 @@ folderpath_input.pack(
 guide_label = tk.Label(
     inputs_frame,
     text=(
-        "All JPEG images inside this folder will be watercolorized.\nOriginal image is"
-        " left untouched, while the new image is placed beside the original."
+        "Any JPEG images inside this folder will be automatically watercolorized if"
+        " running.\nOriginal image will be left untouched. New image will be"
+        " placed beside the original."
     ),
     anchor="center",
     font=small_font,
