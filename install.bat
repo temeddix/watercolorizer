@@ -26,6 +26,7 @@ pip install flake8-print
 pip install flake8-blind-except
 pip install flake8-comprehensions
 pip install flake8-use-fstring
+imageio_download_bin freeimage
 python ./resource/prepare_coding.py
 if %ERRORLEVEL% == 0 (
     cls & echo ■■■■■ Everything is ready. ■■■■■ & TIMEOUT 3

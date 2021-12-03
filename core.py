@@ -74,22 +74,25 @@ def watercolorize(filepath):
         noisy_image, normal_noise, 0.4 + 0.1 * strength.get()
     )
     noisy_image = noisy_image.astype(np.uint8)
-    noisy_image = cv2.cvtColor(noisy_image, cv2.COLOR_RGBA2GRAY)
 
     with tempfile.TemporaryDirectory() as temporary_folderpath:
 
-        # These should be ASCII filepaths
-        noisy_filepath = os.path.join(temporary_folderpath, "noisy_image.jpg")
-        squashed_filepath = os.path.join(temporary_folderpath, "squashed_image.jpg")
+        # OIDN only recognizes PFM image format
+        noisy_filepath = os.path.join(temporary_folderpath, "noisy_image.pfm")
+        squashed_filepath = os.path.join(temporary_folderpath, "squashed_image.pfm")
 
-        cv2.imwrite(noisy_filepath, noisy_image)
+        # For Unicode filepaths do not use cv2.imwrite
+        imageio.imwrite(
+            noisy_filepath,
+            cv2.cvtColor(noisy_image, cv2.COLOR_RGBA2RGB).astype(np.float32) / 256,
+        )
 
         subprocess.call(
             [
-                "./denoiser/Denoiser.exe",
-                "-i",
+                "./denoiser/oidnDenoise.exe",
+                "--ldr",
                 noisy_filepath,
-                "-o",
+                "--output",
                 squashed_filepath,
             ]
         )
@@ -97,15 +100,20 @@ def watercolorize(filepath):
         while not os.path.isfile(squashed_filepath):
             time.sleep(0.01)
 
-        squashed_image = cv2.imread(squashed_filepath, cv2.IMREAD_GRAYSCALE)
+        # For Unicode filepaths do not use cv2.imread
+        squashed_image = imageio.imread(squashed_filepath) * 256
+        squashed_image = squashed_image.astype(np.uint8)
+        squashed_image = cv2.cvtColor(squashed_image, cv2.COLOR_BGR2HSV)
+        _, _, squashed_image = cv2.split(squashed_image)
 
     matched_image = exposure.match_histograms(squashed_image, gray_image)
     matched_image = matched_image.astype(np.uint8)
+    matched_image
 
     hsv_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2HSV)
     hue, saturation, _ = cv2.split(hsv_image)
-    hsv_image = cv2.merge([hue, saturation, matched_image])
-    colorized_image = cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
+    colorized_image = cv2.merge([hue, saturation, matched_image])
+    colorized_image = cv2.cvtColor(colorized_image, cv2.COLOR_HSV2BGR)
 
     # For Unicode filepaths do not use cv2.imwrite
     output_image = cv2.cvtColor(colorized_image, cv2.COLOR_BGR2RGB)
