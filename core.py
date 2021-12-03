@@ -31,27 +31,41 @@ elif platform.system() == "Darwin":  # macOS
     pass
 
 
+def remove_isolated_pixels(image):
+    # https://stackoverflow.com/questions/46143800/removing-isolated-pixels-using-opencv
+
+    connectivity = 32
+
+    output = cv2.connectedComponentsWithStats(image, connectivity, cv2.CV_32S)
+
+    num_stats = output[0]
+    labels = output[1]
+    stats = output[2]
+
+    new_image = image.copy()
+
+    for label in range(num_stats):
+        if stats[label, cv2.CC_STAT_AREA] == 1:
+            new_image[labels == label] = 0
+
+    return new_image
+
+
 def create_lineart(gray_image):
+
     row_count, column_count = gray_image.shape
-    kernel = np.array(
-        [
-            [1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1],
-        ],
-        np.uint8,
+    alpha_image = cv2.adaptiveThreshold(
+        gray_image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 7, 2
     )
-    dilated_image = cv2.dilate(gray_image, kernel, iterations=1)
-    difference_image = cv2.absdiff(dilated_image, gray_image)
-    difference_image[difference_image >= 16] = 255
+    alpha_image = 255 - alpha_image
+    alpha_image = remove_isolated_pixels(alpha_image)
     lineart_image = np.zeros((row_count, column_count, 4), dtype=np.uint8)
-    lineart_image[:, :, 3] = difference_image
+    lineart_image[:, :, 3] = alpha_image
     return lineart_image
 
 
 def toggle_automation():
+
     global is_on
     if is_on:
         is_on = False
