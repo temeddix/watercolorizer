@@ -7,6 +7,7 @@ import threading
 import time
 import subprocess
 import tempfile
+import imageio
 
 import cv2
 import numpy as np
@@ -42,9 +43,9 @@ def toggle_automation():
 
 def watercolorize(filepath):
 
-    # For Unicode filepaths...
-    temporary_array = np.fromfile(filepath, np.uint8)
-    original_image = cv2.imdecode(temporary_array, cv2.IMREAD_UNCHANGED)
+    # For Unicode filepaths do not use cv2.imread
+    input_image = imageio.imread(filepath)
+    original_image = cv2.cvtColor(input_image, cv2.COLOR_RGB2BGR)
     row_count, column_count, _ = original_image.shape
 
     if not is_unlimited.get():
@@ -106,12 +107,10 @@ def watercolorize(filepath):
     hsv_image = cv2.merge([hue, saturation, matched_image])
     colorized_image = cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
 
-    final_filepath = os.path.splitext(filepath)[0] + "-watercolorized.jpg"
-
-    # For Unicode filepaths...
-    _, buffer = cv2.imencode(".jpg", colorized_image, None)
-    with open(final_filepath, mode="w+b") as file:
-        buffer.tofile(file)
+    # For Unicode filepaths do not use cv2.imwrite
+    output_image = cv2.cvtColor(colorized_image, cv2.COLOR_BGR2RGB)
+    output_filepath = os.path.splitext(filepath)[0] + "-watercolorized.jpg"
+    imageio.imwrite(output_filepath, output_image)
 
 
 def automate():
