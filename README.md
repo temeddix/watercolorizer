@@ -1,7 +1,7 @@
 # Watercolorize
 Apply watercolor look to your photos or renders
 
-<img width="843" alt="image" src="https://user-images.githubusercontent.com/66480156/144498707-d4511f7e-659f-4c70-87be-3529a50bd262.png">
+<img width="842" alt="image" src="https://user-images.githubusercontent.com/66480156/144583768-4e76b418-9e78-48a8-a2e5-cc427b17e050.png">
 
 ## About
 * May be useful at certain cases
@@ -9,6 +9,7 @@ Apply watercolor look to your photos or renders
 * Executing is even easier with `execute.bat`
 * Currently only available on Windows. Support for macOS and Linux can be added if there is demand for it.
 * Underlying mechanism is to add intentional noise to the image in a specific way and denoise the image with Intel OIDN AI denoiser. This way small details get lost while big details mostly preserve their shape.
+* For further support, please write it as an issue at the GitHub repository page of this project.
 ## Samples
 Watercolorized with strength set to moderate.
 
