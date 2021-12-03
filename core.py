@@ -160,9 +160,9 @@ strength = tk.IntVar()
 strength.set(3)
 
 default_font = font.nametofont("TkDefaultFont")
-default_font.config(size=11)
+default_font.config(size=10)
 big_font = default_font.copy()
-big_font.config(size=16)
+big_font.config(size=14)
 small_font = default_font.copy()
 small_font.config(size=8)
 
@@ -183,6 +183,7 @@ title_label = tk.Label(
     inputs_frame,
     text="Folder containing images to watercolorize",
     anchor="center",
+    font=big_font,
 )
 title_label.pack(
     padx=2 * scale_factor,
