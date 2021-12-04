@@ -103,7 +103,9 @@ def watercolorize(filepath):
     normal_noise = normal_noise.astype(np.uint8)
     normal_noise = cv2.cvtColor(normal_noise, cv2.COLOR_GRAY2RGBA).astype(float)
 
-    hsv_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2HSV)
+    unfocused_image = cv2.GaussianBlur(original_image, (0, 0), 1)
+
+    hsv_image = cv2.cvtColor(unfocused_image, cv2.COLOR_BGR2HSV)
     _, _, gray_image = cv2.split(hsv_image)
     noisy_image = cv2.cvtColor(gray_image, cv2.COLOR_GRAY2RGBA).astype(float)
     noisy_image = blend_modes.hard_light(
@@ -146,7 +148,7 @@ def watercolorize(filepath):
     matched_image = matched_image.astype(np.uint8)
     matched_image
 
-    hsv_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2HSV)
+    hsv_image = cv2.cvtColor(unfocused_image, cv2.COLOR_BGR2HSV)
     hue, saturation, _ = cv2.split(hsv_image)
     colorized_image = cv2.merge([hue, saturation, matched_image])
     colorized_image = cv2.cvtColor(colorized_image, cv2.COLOR_HSV2BGR)
