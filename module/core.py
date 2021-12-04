@@ -149,7 +149,7 @@ def watercolorize(filepath):
     colorized_image = cv2.merge([hue, saturation, matched_image])
     colorized_image = cv2.cvtColor(colorized_image, cv2.COLOR_HSV2BGR)
 
-    if is_lineart_on:
+    if is_lineart_on.get():
         lineart_image = create_lineart(squashed_image)
         colorized_image = blend_modes.normal(
             cv2.cvtColor(colorized_image, cv2.COLOR_BGR2RGBA).astype(float),
@@ -201,7 +201,7 @@ scale_factor = round(window.winfo_fpixels("1i") / 96, 2)
 is_unlimited = tk.IntVar()
 is_unlimited.set(0)
 is_lineart_on = tk.IntVar()
-is_unlimited.set(0)
+is_lineart_on.set(0)
 strength = tk.IntVar()
 strength.set(3)
 
