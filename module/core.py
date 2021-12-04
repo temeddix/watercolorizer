@@ -92,6 +92,8 @@ def watercolorize(filepath):
             size = (int(column_count * (1280 / row_count)), 1280)
         elif column_count > 1280:
             size = (1280, int(row_count * (1280 / column_count)))
+        else:
+            size = (column_count, row_count)
         original_image = cv2.resize(original_image, size)
         row_count, column_count, _ = original_image.shape
 
