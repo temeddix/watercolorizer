@@ -1,4 +1,4 @@
-# Watercolorize
+# Watercolorizer
 Apply watercolor look to your photos or renders
 
 <img width="842" alt="image" src="https://user-images.githubusercontent.com/66480156/144597812-f8d0ab94-949e-4a38-8c1a-604a894810a6.png">
