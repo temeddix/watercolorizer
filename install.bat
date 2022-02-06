@@ -13,8 +13,8 @@ if exist %USERPROFILE%/miniconda3 (
 cls & echo ■■■■■ Now to create Python environment and install packages. ■■■■■ & TIMEOUT 3
 call %USERPROFILE%/miniconda3/condabin/conda.bat config --add channels conda-forge
 call %USERPROFILE%/miniconda3/condabin/conda.bat config --set channel_priority strict
-call %USERPROFILE%/miniconda3/condabin/conda.bat create -y -n watercolorize python=3.8 --force
-call %USERPROFILE%/miniconda3/condabin/conda.bat activate watercolorize
+call %USERPROFILE%/miniconda3/condabin/conda.bat create -y -n watercolorizer python=3.8 --force
+call %USERPROFILE%/miniconda3/condabin/conda.bat activate watercolorizer
 pip install opencv-python
 pip install blend-modes
 pip install scikit-image
